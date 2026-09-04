@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>โปรแกรมคำนวณพลังงานและโปรตีนสำหรับคนไข้</title>
+    <!-- Tailwind CSS for Modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Sarabun) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f0f7f4;
+            -webkit-tap-highlight-color: transparent; /* Remove mobile tap highlight */
+        }
+        
+        /* Smooth scale animation on active touch */
+        .active-scale:active {
+            transform: scale(0.98);
+        }
+
+        @media print {
+            body { background-color: white; }
+            .no-print { display: none !important; }
+            .print-card { border: 1px solid #e2e8f0; box-shadow: none !important; border-radius: 0.5rem; }
+            .print-padding { padding: 1.5rem !important; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 min-h-screen flex flex-col justify-between antialiased">
+
+    <!-- Header Section -->
+    <header class="bg-teal-600 text-white shadow-md no-print sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-4 sm:py-5 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-2 rounded-full text-teal-600 shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-heart-pulse text-xl sm:text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-wide leading-tight">การคำนวณพลังงานและโปรตีนที่เหมาสมรายบุคคล</h1>
+                    <p class="text-[10px] sm:text-xs text-teal-100">โปรแกรมคำนวณพลังงานและโปรตีน</p>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-3xl mx-auto px-3 sm:px-4 py-4 sm:py-8 flex-grow w-full">
+        <div class="bg-white rounded-2xl shadow-lg sm:shadow-xl overflow-hidden print-card">
+            <div class="h-2.5 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-600"></div>
+            
+            <div class="p-4 sm:p-8 print-padding">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h2 class="text-xl sm:text-2xl font-bold text-teal-800 leading-snug">การคำนวณพลังงานและโปรตีนที่เหมาะสมรายบุคคล</h2>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-1.5 px-2">กรอกข้อมูลส่วนตัวเพื่อประเมินความต้องการพลังงานและโปรตีนที่เหมาะสมต่อวัน</p>
+                </div>
+
+                <!-- Input Section: Patient Profile -->
+                <div class="bg-emerald-50/40 p-4 sm:p-6 rounded-xl border border-emerald-100/70 mb-5 sm:mb-6">
+                    <h3 class="text-emerald-900 font-bold text-base sm:text-lg mb-4 flex items-center">
+                        <i class="fa-solid fa-user-injured text-emerald-600 mr-2"></i>ข้อมูลส่วนตัวของคนไข้
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                        <!-- Gender Selection -->
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5">เพศ</label>
+                            <div class="grid grid-cols-2 gap-2.5">
+                                <label class="active-scale flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition-all duration-200 select-none text-sm sm:text-base font-medium" id="label-gender-male">
+                                    <input type="radio" name="gender" id="gender-male" value="male" checked class="hidden">
+                                    <i class="fa-solid fa-person text-blue-500 text-xl"></i>
+                                </label>
+                                <label class="active-scale flex items-center justify-center py-3 px-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition-all duration-200 select-none text-sm sm:text-base font-medium" id="label-gender-female">
+                                    <input type="radio" name="gender" id="gender-female" value="female" class="hidden">
+                                    <i class="fa-solid fa-person-dress text-pink-500 text-xl"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Age -->
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5" for="age">อายุ</label>
+                            <div class="relative rounded-xl shadow-sm">
+                                <input type="number" id="age" min="1" max="120" inputmode="numeric" pattern="[0-8]*"
+                                    class="block w-full rounded-xl border-2 border-emerald-100/70 px-4 py-3 text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition font-semibold" 
+                                    placeholder="กรอกอายุ">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-400 text-sm font-medium">ปี</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <!-- Current Weight -->
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5" for="current-weight">น้ำหนักปัจจุบัน</label>
+                            <div class="relative rounded-xl shadow-sm">
+                                <input type="number" id="current-weight" step="0.1" min="1" max="250" inputmode="decimal"
+                                    class="block w-full rounded-xl border-2 border-emerald-100/70 px-4 py-3 text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition font-semibold" 
+                                    placeholder="น้ำหนัก">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-400 text-sm font-medium">กก.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Height -->
+                        <div>
+                            <label class="block text-xs sm:text-sm font-semibold text-gray-600 mb-1.5" for="height">ส่วนสูง</label>
+                            <div class="relative rounded-xl shadow-sm">
+                                <input type="number" id="height" min="50" max="250" inputmode="numeric"
+                                    class="block w-full rounded-xl border-2 border-emerald-100/70 px-4 py-3 text-base focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition font-semibold" 
+                                    placeholder="ส่วนสูง">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                    <span class="text-gray-400 text-sm font-medium">ซม.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Target Weight Display (Automated) -->
+                    <div class="mt-4 pt-4 border-t border-emerald-100 flex flex-row justify-between items-center gap-2">
+                        <div>
+                            <span class="text-xs sm:text-sm font-bold text-emerald-850 block">น้ำหนักตัวที่ควรจะเป็น (IBW):</span>
+                            <span class="text-[10px] sm:text-xs text-gray-400" id="ibw-formula-text">สูตรเพศชาย: ส่วนสูง - 100</span>
+                        </div>
+                        <div class="text-right flex items-baseline flex-shrink-0">
+                            <span class="text-xl sm:text-2xl font-extrabold text-teal-700" id="calculated-ibw">--</span>
+                            <span class="text-xs sm:text-sm font-bold text-teal-700 ml-1">กก.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 1: Energy -->
+                <div class="border-b border-gray-100 pb-5 sm:pb-6 mb-5 sm:mb-6">
+                    <h3 class="text-base sm:text-lg font-bold text-teal-800 mb-3 flex items-center">
+                        <span class="bg-teal-100 text-teal-800 text-xs sm:text-sm font-semibold mr-2.5 px-2.5 py-0.5 rounded-full">1</span>
+                        พลังงานที่ควรได้รับ (Energy Requirement)
+                    </h3>
+                    <p class="text-[11px] sm:text-xs text-gray-400 mb-3.5"><i class="fa-solid fa-wand-magic-sparkles mr-1 text-teal-600"></i>ระบบเลือกเงื่อนไขให้อัตโนมัติจากอายุ แต่คุณสามารถกดปรับเปลี่ยนแมนนวลได้</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Option 1.1 -->
+                        <label class="active-scale relative flex p-3.5 rounded-xl border-2 border-gray-200 cursor-pointer hover:bg-teal-50/20 transition-all duration-200 select-none" id="label-energy-elderly">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5 mt-0.5">
+                                    <input id="energy-elderly" name="energy_option" type="radio" value="elderly" checked class="h-4.5 w-4.5 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                </div>
+                                <div class="ml-3 text-xs sm:text-sm">
+                                    <span class="block font-bold text-gray-800 text-sm sm:text-base">อายุมากกว่า 60 ปี</span>
+                                    <span class="block text-[11px] text-gray-500 mt-0.5">30 kcal / นน.ตัวที่ควรจะเป็น 1 กก./วัน</span>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 1.2 -->
+                        <label class="active-scale relative flex p-3.5 rounded-xl border-2 border-gray-200 cursor-pointer hover:bg-teal-50/20 transition-all duration-200 select-none" id="label-energy-adult">
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5 mt-0.5">
+                                    <input id="energy-adult" name="energy_option" type="radio" value="adult" class="h-4.5 w-4.5 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                </div>
+                                <div class="ml-3 text-xs sm:text-sm">
+                                    <span class="block font-bold text-gray-800 text-sm sm:text-base">อายุน้อยกว่า 60 ปี</span>
+                                    <span class="block text-[11px] text-gray-500 mt-0.5">35 kcal / นน.ตัวที่ควรจะเป็น 1 กก./วัน</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Section 2: Protein Goal & Amount -->
+                <div class="border-b border-gray-100 pb-5 sm:pb-6 mb-5 sm:mb-6">
+                    <h3 class="text-base sm:text-lg font-bold text-teal-800 mb-3 flex items-center">
+                        <span class="bg-teal-100 text-teal-800 text-xs sm:text-sm font-semibold mr-2.5 px-2.5 py-0.5 rounded-full">2</span>
+                        เป้าหมายและปริมาณโปรตีนที่ควรได้รับ (Protein Requirement)
+                    </h3>
+                    
+                    <div class="mb-4 bg-gray-50 p-3 sm:p-4 rounded-xl text-xs sm:text-sm space-y-1">
+                        <div class="font-bold text-gray-700 mb-1 flex items-center"><i class="fa-solid fa-bullseye text-teal-600 mr-1.5"></i>เป้าหมายการประเมิน:</div>
+                        <div class="text-gray-500 flex items-center"><i class="fa-solid fa-circle-check text-emerald-600 mr-2"></i>ป้องกันภาวะขาดโปรตีน / ชะลอการเสื่อมของไต</div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <!-- Option 2.1 -->
+                        <label class="active-scale relative flex p-3.5 sm:p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:bg-teal-50/20 transition-all duration-200 select-none" id="label-protein-high">
+                            <div class="flex items-start w-full">
+                                <div class="flex items-center h-5 mt-1 flex-shrink-0">
+                                    <input id="protein-high" name="protein_option" type="radio" value="high" checked class="h-4.5 w-4.5 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                </div>
+                                <div class="ml-3 text-xs sm:text-sm w-full">
+                                    <span class="block font-bold text-gray-800 text-sm sm:text-base">โปรตีน 1.0 - 1.5 กรัม/นน.ตัว 1 กก./วัน</span>
+                                    <span class="inline-block bg-teal-100 text-teal-800 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full mt-1">ผู้ป่วยที่ไม่มีภาวะไตเสื่อม</span>
+                                    <div class="mt-2.5 flex items-center space-x-2">
+                                        <span class="text-[11px] text-gray-500">ระบุค่าที่ใช้คำนวณ:</span>
+                                        <input type="number" id="protein-val-high" min="1.0" max="1.5" step="0.1" value="1.0" class="w-14 text-center border-2 rounded-lg border-gray-300 py-0.5 px-1 font-bold text-sm outline-none focus:border-teal-500">
+                                        <span class="text-[11px] text-gray-500">กรัม</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 2.2 -->
+                        <label class="active-scale relative flex p-3.5 sm:p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:bg-teal-50/20 transition-all duration-200 select-none" id="label-protein-mid">
+                            <div class="flex items-start w-full">
+                                <div class="flex items-center h-5 mt-1 flex-shrink-0">
+                                    <input id="protein-mid" name="protein_option" type="radio" value="mid" class="h-4.5 w-4.5 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                </div>
+                                <div class="ml-3 text-xs sm:text-sm w-full">
+                                    <span class="block font-bold text-gray-800 text-sm sm:text-base">โปรตีน 0.8 - 1.0 กรัม/นน.ตัว 1 กก./วัน</span>
+                                    <span class="inline-block bg-amber-100 text-amber-800 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full mt-1">ผู้ป่วยไตเรื้อรังระยะที่ 1-2, 3a</span>
+                                    <div class="mt-2.5 flex items-center space-x-2">
+                                        <span class="text-[11px] text-gray-500">ระบุค่าที่ใช้คำนวณ:</span>
+                                        <input type="number" id="protein-val-mid" min="0.8" max="1.0" step="0.1" value="0.8" class="w-14 text-center border-2 rounded-lg border-gray-300 py-0.5 px-1 font-bold text-sm outline-none focus:border-teal-500">
+                                        <span class="text-[11px] text-gray-500">กรัม</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 2.3 -->
+                        <label class="active-scale relative flex p-3.5 sm:p-4 rounded-xl border-2 border-gray-200 cursor-pointer hover:bg-teal-50/20 transition-all duration-200 select-none" id="label-protein-low">
+                            <div class="flex items-start w-full">
+                                <div class="flex items-center h-5 mt-1 flex-shrink-0">
+                                    <input id="protein-low" name="protein_option" type="radio" value="low" class="h-4.5 w-4.5 text-teal-600 border-gray-300 focus:ring-teal-500">
+                                </div>
+                                <div class="ml-3 text-xs sm:text-sm w-full">
+                                    <span class="block font-bold text-gray-800 text-sm sm:text-base">โปรตีน 0.6 - 0.8 กรัม/นน.ตัว 1 กก./วัน</span>
+                                    <span class="inline-block bg-red-100 text-red-800 text-[10px] sm:text-xs font-semibold px-2.5 py-0.5 rounded-full mt-1">ผู้ป่วยไตเรื้อรังระยะที่ 3b , 4-5</span>
+                                    <div class="mt-2.5 flex items-center space-x-2">
+                                        <span class="text-[11px] text-gray-500">ระบุค่าที่ใช้คำนวณ:</span>
+                                        <input type="number" id="protein-val-low" min="0.6" max="0.8" step="0.1" value="0.6" class="w-14 text-center border-2 rounded-lg border-gray-300 py-0.5 px-1 font-bold text-sm outline-none focus:border-teal-500">
+                                        <span class="text-[11px] text-gray-500">กรัม</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Real-time Output (Highly Responsive Cards) -->
+                <div class="bg-gradient-to-br from-teal-800 to-emerald-900 text-white rounded-2xl p-5 sm:p-7 shadow-lg relative overflow-hidden">
+                    <h3 class="text-lg sm:text-xl font-bold border-b border-teal-700/60 pb-3.5 mb-4 flex items-center">
+                        <i class="fa-solid fa-square-poll-vertical text-teal-300 mr-2.5"></i>ผลการคำนวณรายวัน
+                    </h3>
+
+                    <div class="mb-4 text-xs sm:text-sm bg-teal-900/40 p-2.5 rounded-xl border border-teal-700/30 inline-flex items-center">
+                        <i class="fa-solid fa-bullseye text-emerald-400 mr-1.5"></i>
+                        <span>น้ำหนักเป้าหมาย: <span class="font-extrabold text-emerald-300 text-base sm:text-lg ml-1" id="out-target-weight">--</span> กก.</span>
+                    </div>
+
+                    <!-- Fluid Responsive Grid: 1 col on mobile, 2 cols on tablet/desktop -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10 flex flex-col justify-between">
+                            <span class="text-[11px] sm:text-xs text-emerald-200 font-bold block mb-1">พลังงานที่ควรได้รับ</span>
+                            <div class="flex items-baseline mt-1">
+                                <span class="text-2xl sm:text-3xl font-extrabold" id="out-energy">--</span>
+                                <span class="text-xs text-teal-200 ml-1.5 font-medium">kcal/วัน</span>
+                            </div>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[11px] sm:text-xs text-emerald-200 font-bold block mb-1">ปริมาณโปรตีนที่ควรได้รับ</span>
+                                <div class="flex items-baseline mt-1">
+                                    <span class="text-2xl sm:text-3xl font-extrabold" id="out-protein">--</span>
+                                    <span class="text-xs text-teal-200 ml-1.5 font-medium">กรัม/วัน</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-teal-300 block mt-2" id="out-protein-formula">--</span>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[11px] sm:text-xs text-emerald-200 font-bold block mb-1">เนื้อสัตว์ (ส่วน)</span>
+                                <div class="flex items-baseline mt-1">
+                                    <span class="text-2xl sm:text-3xl font-extrabold" id="out-meat-portion">--</span>
+                                    <span class="text-xs text-teal-200 ml-1.5 font-medium">ส่วน/วัน</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-teal-300 block mt-2"><i class="fa-solid fa-calculator mr-1"></i>(ปริมาณโปรตีนรวม / 7)</span>
+                        </div>
+                        <div class="bg-white/10 p-4 rounded-xl border border-white/10 flex flex-col justify-between">
+                            <div>
+                                <span class="text-[11px] sm:text-xs text-emerald-200 font-bold block mb-1">เนื้อสัตว์ (ช้อนโต๊ะ)</span>
+                                <div class="flex items-baseline mt-1">
+                                    <span class="text-2xl sm:text-3xl font-extrabold" id="out-meat-spoons">--</span>
+                                    <span class="text-xs text-teal-200 ml-1.5 font-medium">ช้อนโต๊ะ/วัน</span>
+                                </div>
+                            </div>
+                            <span class="text-[10px] text-teal-300 block mt-2"><i class="fa-solid fa-calculator mr-1"></i>(จำนวนส่วนข้างต้น * 2)</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 bg-emerald-950/45 p-3.5 rounded-xl border border-emerald-500/20 text-[11px] sm:text-xs text-emerald-100 space-y-1">
+                        <div class="font-bold text-emerald-300 flex items-center"><i class="fa-solid fa-lightbulb mr-1.5 text-amber-400"></i> แนะนำเพิ่มเติม:</div>
+                        <p>• เนื้อสัตว์ 1 ส่วน = เนื้อสุกสับ/หั่นประมาณ 2 ช้อนโต๊ะกินข้าวทั่วไป (แนะปลาและไข่ขาว หลีกเลี่ยงเนื้อสุกรติดมันและอาหารแปรรูปทุกชนิด)</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-gray-850 text-gray-400 py-5 text-center text-[10px] sm:text-xs no-print border-t border-gray-200">
+        <div class="max-w-3xl mx-auto px-4">
+            <p>© 2026 โปรแกรมประเมินโภชนาการแพทย์รายบุคคล</p>
+        </div>
+    </footer>
+
+    <script>
+        // Profile DOM Elements
+        const genderMale = document.getElementById('gender-male');
+        const genderFemale = document.getElementById('gender-female');
+        const ageInput = document.getElementById('age');
+        const currentWeightInput = document.getElementById('current-weight');
+        const heightInput = document.getElementById('height');
+        
+        // Target weight formula / value display
+        const ibwFormulaText = document.getElementById('ibw-formula-text');
+        const calculatedIbwText = document.getElementById('calculated-ibw');
+
+        // Label Styles DOM Elements
+        const labelGenderMale = document.getElementById('label-gender-male');
+        const labelGenderFemale = document.getElementById('label-gender-female');
+
+        // Logic & Option DOM Elements
+        const energyElderlyRadio = document.getElementById('energy-elderly');
+        const energyAdultRadio = document.getElementById('energy-adult');
+        const proteinHighRadio = document.getElementById('protein-high');
+        const proteinMidRadio = document.getElementById('protein-mid');
+        const proteinLowRadio = document.getElementById('protein-low');
+        const proteinValHigh = document.getElementById('protein-val-high');
+        const proteinValMid = document.getElementById('protein-val-mid');
+        const proteinValLow = document.getElementById('protein-val-low');
+
+        // Output Display DOM Elements
+        const outTargetWeight = document.getElementById('out-target-weight');
+        const outEnergy = document.getElementById('out-energy');
+        const outProtein = document.getElementById('out-protein');
+        const outProteinFormula = document.getElementById('out-protein-formula');
+        const outMeatPortion = document.getElementById('out-meat-portion');
+        const outMeatSpoons = document.getElementById('out-meat-spoons');
+
+        const labelEnergyElderly = document.getElementById('label-energy-elderly');
+        const labelEnergyAdult = document.getElementById('label-energy-adult');
+        const labelProteinHigh = document.getElementById('label-protein-high');
+        const labelProteinMid = document.getElementById('label-protein-mid');
+        const labelProteinLow = document.getElementById('label-protein-low');
+
+        let userChangedEnergyManually = false;
+
+        // Function: Calculate Ideal Body Weight (IBW)
+        function calculateIBW() {
+            const height = parseFloat(heightInput.value);
+            const isMale = genderMale.checked;
+
+            if (isNaN(height) || height <= 0) {
+                return null;
+            }
+
+            let ibw = 0;
+            if (isMale) {
+                ibw = height - 100;
+                ibwFormulaText.textContent = "สูตรเพศชาย: ส่วนสูง - 100";
+            } else {
+                ibw = height - 105;
+                ibwFormulaText.textContent = "สูตรเพศหญิง: ส่วนสูง - 105";
+            }
+
+            return ibw > 0 ? ibw : null;
+        }
+
+        // Function: Handle Age-based Energy Auto-selection
+        function handleAgeAutoSelection() {
+            const age = parseInt(ageInput.value);
+            if (!isNaN(age) && age > 0 && !userChangedEnergyManually) {
+                if (age > 60) {
+                    energyElderlyRadio.checked = true;
+                } else {
+                    energyAdultRadio.checked = true;
+                }
+                updateStyles();
+            }
+        }
+
+        // Function: Master Calculation
+        function calculateNutrition() {
+            const ibw = calculateIBW();
+
+            if (ibw === null) {
+                calculatedIbwText.textContent = '--';
+                outTargetWeight.textContent = '--'; 
+                outEnergy.textContent = '--'; 
+                outProtein.textContent = '--';
+                outProteinFormula.textContent = '--'; 
+                outMeatPortion.textContent = '--'; 
+                outMeatSpoons.textContent = '--';
+                return;
+            }
+
+            calculatedIbwText.textContent = ibw.toFixed(1);
+            outTargetWeight.textContent = ibw.toFixed(1);
+
+            // 1. Calculate Energy using IBW
+            let energyMultiplier = energyAdultRadio.checked ? 35 : 30;
+            outEnergy.textContent = Math.round(ibw * energyMultiplier).toLocaleString();
+
+            // 2. Calculate Protein using IBW
+            let selectedProteinFactor = 1.0;
+            if (proteinHighRadio.checked) selectedProteinFactor = parseFloat(proteinValHigh.value) || 1.0;
+            else if (proteinMidRadio.checked) selectedProteinFactor = parseFloat(proteinValMid.value) || 0.8;
+            else if (proteinLowRadio.checked) selectedProteinFactor = parseFloat(proteinValLow.value) || 0.6;
+
+            const calculatedProtein = ibw * selectedProteinFactor;
+            outProtein.textContent = calculatedProtein.toFixed(1);
+            outProteinFormula.textContent = `น้ำหนักเป้าหมาย ${ibw.toFixed(1)} กก. × ${selectedProteinFactor} กรัม`;
+
+            // 3. Calculate Meat Portions and Spoons
+            const calculatedPortion = calculatedProtein / 7;
+            outMeatPortion.textContent = calculatedPortion.toFixed(1);
+            outMeatSpoons.textContent = (calculatedPortion * 2).toFixed(1);
+        }
+
+        // Function: Visual updates for states/buttons
+        function updateStyles() {
+            // Gender Styling
+            if (genderMale.checked) {
+                labelGenderMale.classList.add('border-blue-500', 'bg-blue-50/50');
+                labelGenderFemale.classList.remove('border-pink-500', 'bg-pink-50/50');
+            } else {
+                labelGenderFemale.classList.add('border-pink-500', 'bg-pink-50/50');
+                labelGenderMale.classList.remove('border-blue-500', 'bg-blue-50/50');
+            }
+
+            // Energy radio styling
+            if (energyElderlyRadio.checked) {
+                labelEnergyElderly.classList.add('border-teal-500', 'bg-teal-50/50');
+                labelEnergyAdult.classList.remove('border-teal-500', 'bg-teal-50/50');
+            } else {
+                labelEnergyAdult.classList.add('border-teal-500', 'bg-teal-50/50');
+                labelEnergyElderly.classList.remove('border-teal-500', 'bg-teal-50/50');
+            }
+
+            // Protein radio styling
+            if (proteinHighRadio.checked) {
+                labelProteinHigh.classList.add('border-teal-500', 'bg-teal-50/50');
+                labelProteinMid.classList.remove('border-amber-500', 'bg-amber-50/30');
+                labelProteinLow.classList.remove('border-red-500', 'bg-red-50/30');
+            } else if (proteinMidRadio.checked) {
+                labelProteinMid.classList.add('border-amber-500', 'bg-amber-50/30');
+                labelProteinHigh.classList.remove('border-teal-500', 'bg-teal-50/50');
+                labelProteinLow.classList.remove('border-red-500', 'bg-red-50/30');
+            } else if (proteinLowRadio.checked) {
+                labelProteinLow.classList.add('border-red-500', 'bg-red-50/30');
+                labelProteinHigh.classList.remove('border-teal-500', 'bg-teal-50/50');
+                labelProteinMid.classList.remove('border-amber-500', 'bg-amber-50/30');
+            }
+        }
+
+        // Function: Reset All Inputs & Outputs
+        function resetForm() {
+            genderMale.checked = true;
+            ageInput.value = '';
+            currentWeightInput.value = '';
+            heightInput.value = '';
+            
+            energyElderlyRadio.checked = true;
+            proteinHighRadio.checked = true;
+            
+            proteinValHigh.value = '1.0';
+            proteinValMid.value = '0.8';
+            proteinValLow.value = '0.6';
+
+            userChangedEnergyManually = false;
+
+            updateStyles();
+            calculateNutrition();
+        }
+
+        // --- Event Listeners ---
+
+        [genderMale, genderFemale].forEach(el => el.addEventListener('change', () => {
+            updateStyles();
+            calculateNutrition();
+        }));
+
+        ageInput.addEventListener('input', () => {
+            handleAgeAutoSelection();
+            calculateNutrition();
+        });
+
+        heightInput.addEventListener('input', calculateNutrition);
+        currentWeightInput.addEventListener('input', calculateNutrition);
+
+        [energyElderlyRadio, energyAdultRadio].forEach(el => el.addEventListener('change', () => {
+            userChangedEnergyManually = true; 
+            updateStyles();
+            calculateNutrition();
+        }));
+
+        [proteinHighRadio, proteinMidRadio, proteinLowRadio].forEach(el => el.addEventListener('change', () => {
+            updateStyles();
+            calculateNutrition();
+        }));
+
+        [proteinValHigh, proteinValMid, proteinValLow].forEach(el => el.addEventListener('input', calculateNutrition));
+
+        window.onload = function() {
+            updateStyles();
+            calculateNutrition();
+        };
+    </script>
+</body>
+</html>
